@@ -1,0 +1,19 @@
+{
+  "images" :
+  [
+    {
+      "image" : "argame00.jpg",
+      "name" : "argame"
+    },
+    {
+      "image" : "/sdcard/DCIM/P60805-195749.jpg",
+      "name" : "4"
+    },
+    {
+      "image" : "idback.jpg",
+      "name" : "idback",
+      "size" : [8.56, 5.4],
+      "uid" : "uid-string"
+    }
+  ]
+}

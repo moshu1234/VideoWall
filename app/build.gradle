@@ -6,7 +6,7 @@ model {
         buildToolsVersion = "23.0.2"
 
         defaultConfig.with {
-            applicationId = "cn.easyar.samples.helloarvideo"
+            applicationId = "andrewl.videowall"
             minSdkVersion.apiLevel  =15
             targetSdkVersion.apiLevel = 23
             versionCode = 1

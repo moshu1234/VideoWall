@@ -4,7 +4,7 @@
 * and other countries for the augmented reality technology developed by VisionStar Information Technology (Shanghai) Co., Ltd.
 */
 
-package andrewl.videowall.UI;
+package andrewl.videowall.UI.EasyAR;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;

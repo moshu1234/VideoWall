@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">视频墙</string>
     <string name="action_settings">Settings</string>
+    <string name="action_start">开始扫描</string>
+    <string name="action_videoConnect">关联视频</string>
+    <string name="action_connectManagment">关联管理</string>
 </resources>

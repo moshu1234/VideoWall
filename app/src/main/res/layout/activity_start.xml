@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android_custom="http://schemas.android.com/apk/res-auto">
+    <andrewl.videowall.UI.MyWidget.WidgetTopBar
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android_custom:m_title="@string/app_name"
+        android_custom:m_left_image="@drawable/abc_ic_search_api_mtrl_alpha"
+        android_custom:m_right_image="@drawable/abc_ic_menu_share_mtrl_alpha" />
+        <FrameLayout
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+    <me.majiajie.pagerbottomtabstrip.PagerBottomTabLayout
+        android:id="@+id/tab"
+        app:elevation="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+</LinearLayout>

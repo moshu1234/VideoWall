@@ -9,15 +9,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import andrewl.videowall.DataBase.bmob.BmobHelper;
+import andrewl.videowall.DataBase.bmob.BmobPerson;
+import andrewl.videowall.DataBase.bmob.BmobPersonData;
+import andrewl.videowall.DataBase.greendao.EventBusMessage;
 import andrewl.videowall.DataBase.greendao.VideoWallHelper;
 import andrewl.videowall.R;
 
 import andrewl.videowall.UI.MyWidget.WidgetTopBar;
 
+import andrewl.videowall.Utils.FileUtils;
 import me.majiajie.pagerbottomtabstrip.Controller;
 import me.majiajie.pagerbottomtabstrip.PagerBottomTabLayout;
 import me.majiajie.pagerbottomtabstrip.TabItemBuilder;
@@ -31,17 +39,27 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new EventBusMessage(1,"init ui and data"));
         ActionBar actionBar = getSupportActionBar();//高版本可以换成 ActionBar actionBar = getActionBar();
         actionBar.hide();
-        BottomTabTest();
         mVideoWallHelper = new VideoWallHelper().getInstance();
         mVideoWallHelper.initGreenDao(this,"T_VIDEOWALL");
-        initTopbar();
-        initButtons();
-
-
+//        BottomTabTest();
+//        initTopbar();
+//        initButtons();
+//        initBmob();
         startIntent = new Intent(this,StartActivity.class);
         connectIntent = new Intent(this,VideoConnectActivity.class);
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
     @Override
     public void onConfigurationChanged(Configuration config) {
@@ -150,6 +168,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         //用TabItemBuilder构建一个导航按钮
         TabItemBuilder tabItemBuilder = new TabItemBuilder(this).create()
                 .setDefaultIcon(android.R.drawable.ic_menu_send)
+//                .setSelectedIcon(R.drawable.pic)
                 .setText("信息")
                 .setSelectedColor(testColors[0])
                 .setTag("A")
@@ -162,6 +181,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 .addTabItem(android.R.drawable.ic_menu_search, "搜索",testColors[2])
                 .addTabItem(android.R.drawable.ic_menu_help, "帮助",testColors[3])
 //                .setMode(TabLayoutMode.HIDE_TEXT)
+//                .setMessageNumberColor(0xffffff)
+//                .setDefaultColor(0xff0000)
+//                .setMessageBackgroundColor(0xff0000)
                 .setMode(TabLayoutMode.CHANGE_BACKGROUND_COLOR)
 //                .setMode(TabLayoutMode.HIDE_TEXT| TabLayoutMode.CHANGE_BACKGROUND_COLOR)
                 .build();
@@ -179,5 +201,46 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         bt.setOnClickListener(this);
         bt = (Button)findViewById(R.id.management);
         bt.setOnClickListener(this);
+    }
+
+    /*
+    *1-init
+    */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(EventBusMessage event) {
+        switch (event.type){
+            case 1:
+                initTopbar();
+                BottomTabTest();
+                initButtons();
+                new BmobHelper().initBmob(this);
+                addBmobData();
+                new FileUtils().getInstance().createVideoWallFolder();
+                break;
+        }
+    }
+    public void addBmobData(){
+        BmobPerson bmobUser = new BmobPerson();
+        bmobUser.setNickNmae("taotao");
+        bmobUser.setAge(18);
+        bmobUser.setBirthday("2016-01-01");
+//        bmobUser.setLocalPicAddr("/1/2/1.png");
+//        bmobUserData.save(new SaveListener<String>() {
+//            @Override
+//            public void done(String s, BmobException e) {
+//                if(e == null){
+//                    Log.e("bmobUserData.save done",s);
+//                }else {
+//                    Log.e("bmobUserData.save fail",e.toString());
+//                }
+//            }
+//        });
+//        BmobQuery<BmobPersonData> bmobQuery = new BmobQuery<BmobPersonData>();
+//        bmobQuery.getObject("11111", new QueryListener<BmobPersonData>() {
+//            @Override
+//            public void done(BmobPersonData userData, BmobException e) {
+//
+//            }
+//        });
     }
 }

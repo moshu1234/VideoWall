@@ -4,4 +4,8 @@
     <string name="action_start">开始扫描</string>
     <string name="action_videoConnect">关联视频</string>
     <string name="action_connectManagment">关联管理</string>
+    <string name="action_selectPicture">选择照片</string>
+    <string name="action_takePhoto">拍摄照片</string>
+    <string name="action_selectVideo">选择视频</string>
+    <string name="action_takeVideo">拍摄视频</string>
 </resources>

@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     xmlns:android_custom="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/colorBackground">
+    android:orientation="vertical">
 
     <andrewl.videowall.UI.MyWidget.WidgetTopBar
         android:id="@+id/topbar"

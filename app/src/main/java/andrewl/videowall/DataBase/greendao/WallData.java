@@ -8,13 +8,7 @@ public class WallData {
 
     private Long id;
     private java.util.Date date;
-    private Integer type;
     private String name;
-    private String sex;
-    private java.util.Date birthday;
-    private Integer age;
-    private java.util.Date registerDate;
-    private String authCode;
     private String localPicAddr;
     private String remotePicAddr;
     private String localVideoAddr;
@@ -27,16 +21,10 @@ public class WallData {
         this.id = id;
     }
 
-    public WallData(Long id, java.util.Date date, Integer type, String name, String sex, java.util.Date birthday, Integer age, java.util.Date registerDate, String authCode, String localPicAddr, String remotePicAddr, String localVideoAddr, String remoteVideoAddr) {
+    public WallData(Long id, java.util.Date date, String name, String localPicAddr, String remotePicAddr, String localVideoAddr, String remoteVideoAddr) {
         this.id = id;
         this.date = date;
-        this.type = type;
         this.name = name;
-        this.sex = sex;
-        this.birthday = birthday;
-        this.age = age;
-        this.registerDate = registerDate;
-        this.authCode = authCode;
         this.localPicAddr = localPicAddr;
         this.remotePicAddr = remotePicAddr;
         this.localVideoAddr = localVideoAddr;
@@ -59,60 +47,12 @@ public class WallData {
         this.date = date;
     }
 
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public java.util.Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(java.util.Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public java.util.Date getRegisterDate() {
-        return registerDate;
-    }
-
-    public void setRegisterDate(java.util.Date registerDate) {
-        this.registerDate = registerDate;
-    }
-
-    public String getAuthCode() {
-        return authCode;
-    }
-
-    public void setAuthCode(String authCode) {
-        this.authCode = authCode;
     }
 
     public String getLocalPicAddr() {

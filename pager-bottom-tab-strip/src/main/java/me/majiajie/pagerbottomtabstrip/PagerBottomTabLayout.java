@@ -39,7 +39,9 @@ public class PagerBottomTabLayout extends FrameLayout implements TabStripLinsten
         super(context, attrs, defStyleAttr);
         init(context);
     }
-
+    public PagerBottomTabStrip getPagerBottomTabStrip(){
+        return mPagerBottomTabStrip;
+    }
     private void init(Context context) {
         mContext = context;
         setBackgroundColor(Color.WHITE);

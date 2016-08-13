@@ -230,7 +230,7 @@ class PagerBottomTabStrip extends LinearLayout
     /**
      * 刷新视图
      */
-    protected void invalidateView()
+    public void invalidateView()
     {
         if (Looper.getMainLooper() == Looper.myLooper())
         {
@@ -297,14 +297,15 @@ class PagerBottomTabStrip extends LinearLayout
     private void setSelect(int index)
     {
         //点击已选中项
-        if(mIndex == index )
-        {
-            if(mOnTabItemClickListener != null)
-            {
-                mOnTabItemClickListener.onRepeatClick(mIndex,mTabItems.get(mIndex).getTag());
-            }
-            return;
-        }
+        //disabled by Andrew, I need judge this top level
+//        if(mIndex == index )
+//        {
+//            if(mOnTabItemClickListener != null)
+//            {
+//                mOnTabItemClickListener.onRepeatClick(mIndex,mTabItems.get(mIndex).getTag());
+//            }
+//            return;
+//        }
 
         //不应该存在的索引错误
         if(index >= mTabItems.size())

@@ -29,7 +29,7 @@ public class VideoWallHelper {
         daoSession = daoMaster.newSession();
         dao = daoSession.getWallDataDao();
     }
-    public WallDataDao getNoteDao() {
+    public WallDataDao getDao() {
         return dao;
     }
     public void addNote(WallData note){

@@ -12,7 +12,7 @@ public class TabItemBuilder
     private TabItem mTabItem;
 
     private Context mContext;
-
+    private TabItemBuild mTabItemBuild;
     public TabItemBuilder(@NotNull Context context){
         mContext = context;
     }
@@ -20,7 +20,11 @@ public class TabItemBuilder
     public TabItemBuild create()
     {
         mTabItem = new TabItem(mContext);
-        return mTabItem.builder(this);
+        mTabItemBuild = mTabItem.builder(this);
+        return mTabItemBuild;
+    }
+    public TabItemBuild getTabItemBuild(){
+        return mTabItemBuild;
     }
 
     protected TabItem getTabItem()

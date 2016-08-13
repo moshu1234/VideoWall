@@ -29,6 +29,9 @@ import cn.bmob.v3.listener.UploadFileListener;
 public class BmobHelper {
 
     private String mObjId;
+    public BmobHelper(){
+        mObjId = new String();
+    }
     public void initBmob(Context context){
         EventBus.getDefault().register(this);
         // 初始化 Bmob SDK
@@ -37,6 +40,9 @@ public class BmobHelper {
     }
     public void setmObjId(String objId){
         this.mObjId = objId;
+    }
+    public String getmObjId(){
+        return mObjId;
     }
     public void initPerson(String account){
 

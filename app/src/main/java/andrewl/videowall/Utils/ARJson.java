@@ -31,15 +31,28 @@ public class ARJson {
         for(ARInfo arInfo : arInfos){
             JSONObject jsonObject = new JSONObject();
             String s[] = arInfo.getLocalImgAddr().split("/");
+
             Log.e("saveAsJsonFile","getLocalImgAddr:"+s[s.length-1]);
             jsonObject.put("imageName",s[s.length-1]);
-            Log.e("saveAsJsonFile","getRemoteImagUrl:"+arInfo.getRemoteImagUrl());
+
+            Log.e("saveAsJsonFile","getRemoteImagUrl:"+arInfo.getLocalImgAddr());
             jsonObject.put("imageUrl",arInfo.getLocalImgAddr());
-            String sv[] = arInfo.getLocalVideoADDR().split("/");
-            Log.e("saveAsJsonFile","getLocalVideoADDR:"+sv[sv.length-1]);
-            jsonObject.put("videoName",sv[sv.length-1]);
-            Log.e("saveAsJsonFile","getRemoteVideoUrl:"+arInfo.getRemoteVideoUrl());
-            jsonObject.put("videoUrl",arInfo.getLocalVideoADDR());
+
+
+            if(arInfo.getLocalVideoADDR() != null) {
+                String sv[] = arInfo.getLocalVideoADDR().split("/");
+                Log.e("saveAsJsonFile","getLocalVideoADDR:"+sv[sv.length-1]);
+                jsonObject.put("videoName",sv[sv.length-1]);
+                Log.e("saveAsJsonFile", "getLocalVideoADDR:" + arInfo.getLocalVideoADDR());
+                jsonObject.put("videoUrl", arInfo.getLocalVideoADDR());
+            }else {
+                String sv[] = arInfo.getRemoteVideoUrl().split("/");
+                Log.e("saveAsJsonFile","getRemoteVideoUrl:"+sv[sv.length-1]);
+                jsonObject.put("videoName",sv[sv.length-1]);
+                Log.e("saveAsJsonFile", "getRemoteVideoUrl:" + arInfo.getRemoteVideoUrl());
+                jsonObject.put("videoUrl", arInfo.getRemoteVideoUrl());
+            }
+
             jsonArray.put(jsonObject);
         }
         String json = jsonArray.toString();

@@ -145,20 +145,16 @@ public class BmobHelper {
                         }else {
                             continue;
                         }
+
                         if(bmobPersonData.getLocalVideoAddr()!=null&&new File(bmobPersonData.getLocalVideoAddr()).exists()){
                             arInfo.setLocalVideoADDR(bmobPersonData.getLocalVideoAddr());
                         }else {
                             //file has downloaded else download now
                             if(bmobPersonData.getRemoteVideoAddr()!=null){
-                                if(new File(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename()).exists()) {
-                                    arInfo.setLocalVideoADDR(videoPath + "/" + bmobPersonData.getRemoteVideoAddr().getFilename());
+                                if(bmobPersonData.getRemoteVideoUrl()!=null) {
+                                    arInfo.setRemoteVideoUrl(bmobPersonData.getRemoteVideoUrl());
                                 }else {
-                                    try {
-                                        fileUtils.downloadImage(bmobPersonData.getRemoteVideoUrl(),videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
-                                    } catch (Exception e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    arInfo.setLocalVideoADDR(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
+                                    continue;
                                 }
                             }else {
                                 continue;

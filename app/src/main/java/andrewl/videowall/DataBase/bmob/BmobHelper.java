@@ -34,9 +34,8 @@ import cn.bmob.v3.listener.UploadFileListener;
 public class BmobHelper {
 
     private String mObjId;
-    public BmobHelper(){
-        mObjId = new String();
-    }
+    private String mVideoPath;
+    private String mImagePath;
     public void initBmob(Context context){
         EventBus.getDefault().register(this);
         // 初始化 Bmob SDK
@@ -44,11 +43,14 @@ public class BmobHelper {
         Bmob.initialize(context, "361261f0b3d501e23d63794752378ed7");
         initPerson("liutao");
     }
-    public void setmObjId(String objId){
-        this.mObjId = objId;
-    }
     public String getmObjId(){
         return mObjId;
+    }
+    public void setmVideoPath(String path){
+        this.mVideoPath = path;
+    }
+    public void setmImagePath(String path){
+        this.mImagePath = path;
     }
     public void initPerson(String account){
         UserInfoHelper userInfoHelper = new UserInfoHelper().getInstance();
@@ -122,12 +124,17 @@ public class BmobHelper {
                         }else {
                             //download the image
                             try {
-                                if(bmobPersonData.getRemotePicAddr()!=null
-                                        && new File(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename()).exists()){
-                                    arInfo.setLocalImgAddr(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                //have remote addr
+                                if(bmobPersonData.getRemotePicAddr()!=null ){
+                                    //have downloaded
+                                    if(new File(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename()).exists()){
+                                        arInfo.setLocalImgAddr(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                    }else {
+                                        fileUtils.downloadImage(bmobPersonData.getRemotePicUrl(), imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                        arInfo.setLocalImgAddr(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                    }
                                 }else {
-                                    fileUtils.downloadImage(bmobPersonData.getRemotePicUrl(), imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
-                                    arInfo.setLocalImgAddr(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                    continue;
                                 }
                             } catch (Exception e1) {
                                 e1.printStackTrace();
@@ -135,26 +142,32 @@ public class BmobHelper {
                         }
                         if(bmobPersonData.getRemotePicUrl()!=null) {
                             arInfo.setRemoteImagUrl(bmobPersonData.getRemotePicUrl());
+                        }else {
+                            continue;
                         }
-
                         if(bmobPersonData.getLocalVideoAddr()!=null&&new File(bmobPersonData.getLocalVideoAddr()).exists()){
                             arInfo.setLocalVideoADDR(bmobPersonData.getLocalVideoAddr());
                         }else {
                             //file has downloaded else download now
-                            if(bmobPersonData.getRemoteVideoAddr()!=null
-                                    &&new File(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename()).exists()){
-                                arInfo.setLocalVideoADDR(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
-                            }else {
-                                try {
-                                    fileUtils.downloadImage(bmobPersonData.getRemoteVideoUrl(),videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
+                            if(bmobPersonData.getRemoteVideoAddr()!=null){
+                                if(new File(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename()).exists()) {
+                                    arInfo.setLocalVideoADDR(videoPath + "/" + bmobPersonData.getRemoteVideoAddr().getFilename());
+                                }else {
+                                    try {
+                                        fileUtils.downloadImage(bmobPersonData.getRemoteVideoUrl(),videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
+                                    } catch (Exception e1) {
+                                        e1.printStackTrace();
+                                    }
                                     arInfo.setLocalVideoADDR(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
                                 }
+                            }else {
+                                continue;
                             }
                         }
                         if(bmobPersonData.getRemoteVideoUrl()!=null) {
                             arInfo.setRemoteVideoUrl(bmobPersonData.getRemoteVideoUrl());
+                        }else {
+                            continue;
                         }
                         arInfos.add(arInfo);
                     }
@@ -191,6 +204,8 @@ public class BmobHelper {
                         public void done(String s, BmobException e) {
                             if(e == null){
                                 Log.e("bmob save pic----------","success:"+s);
+//                                mObjId = s;
+                                EventBus.getDefault().post(new EventBusMessage(13,s));
                                 EventBus.getDefault().post(new EventBusMessage(21,s));
                             }else {
                                 Log.e("bmob save failed",e.getMessage());
@@ -204,24 +219,25 @@ public class BmobHelper {
         });
     }
     //update remote image or video url
-    private void updatePersonImageExt(String objId, String url){
+    private void updatePersonImageExt(final String objId, String url){
         BmobPersonData bmobPersonData = new BmobPersonData();
         bmobPersonData.setRemotePicUrl(url);
         bmobPersonData.update(objId, new UpdateListener() {
             @Override
             public void done(BmobException e) {
                 if(e == null){
-                    Log.e("updatePersonDataExt","success:");
+                    Log.e("updatePersonImageExt","success:");
+                    EventBus.getDefault().post(new EventBusMessage(15,"upload video"));
                 }else {
-                    Log.e("updatePersonDataExt ","failed"+e.getMessage());
+                    Log.e("updatePersonImageExt ","failed"+e.getMessage());
                 }
             }
         });
     }
     //TODO:if Video bigger than 10M, don't upload to bmob
     //upload image or video to bmob
-    public void updatePersonVideo(final String VideoPath){
-        Log.e("updatePersonVideo","VideoPath:"+VideoPath+"    mObjId:"+mObjId);
+    public void updatePersonVideo(final String VideoPath, final String objid){
+        Log.e("updatePersonVideo","VideoPath:"+VideoPath+"    mObjId:"+objid);
         final BmobFile file = new BmobFile(new File(VideoPath));
         file.upload(new UploadFileListener() {
             @Override
@@ -232,14 +248,14 @@ public class BmobHelper {
                     data.setAccount(new UserInfoHelper().getInstance().getAccount());
                     data.setLocalVideoAddr(VideoPath);
                     data.setRemoteVideoAddr(file);
-                    data.update(mObjId,new UpdateListener() {
+                    data.update(objid,new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
                             if(e == null){
-                                Log.e("bmob save video------","success:");
-                                EventBus.getDefault().post(new EventBusMessage(22,mObjId));
+                                Log.e("updatePersonVideo","success:");
+                                EventBus.getDefault().post(new EventBusMessage(22,objid));
                             }else {
-                                Log.e("bmob save failed",e.getMessage());
+                                Log.e("updatePersonVideo"," failed:"+e.getMessage());
                             }
                         }
                     });
@@ -257,9 +273,9 @@ public class BmobHelper {
             @Override
             public void done(BmobException e) {
                 if(e == null){
-                    Log.e("updatePersonDataExt","success:");
+                    Log.e("updatePersonVideoExt","success:");
                 }else {
-                    Log.e("updatePersonDataExt ","failed"+e.getMessage());
+                    Log.e("updatePersonVideoExt ","failed"+e.getMessage());
                 }
             }
         });
@@ -272,9 +288,9 @@ public class BmobHelper {
     public void onMessageEvent(final EventBusMessage event) {
         switch (event.type){
             case 21:
-                Log.e("======","save pic:"+event.message);
+                Log.e("======","1 save pic:"+event.message+"   objid:"+mObjId);
                 mObjId = event.message;
-                EventBus.getDefault().post(new EventBusMessage(13,mObjId));
+                Log.e("======","2 save pic:"+event.message+"   objid:"+mObjId);
                 BmobQuery<BmobPersonData> query = new BmobQuery<BmobPersonData>();
                 query.getObject(event.message, new QueryListener<BmobPersonData>() {
                     @Override

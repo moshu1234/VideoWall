@@ -25,6 +25,7 @@ import andrewl.videowall.R;
 
 import andrewl.videowall.UI.MyWidget.WidgetTopBar;
 
+import andrewl.videowall.Utils.ARJson;
 import andrewl.videowall.Utils.FileUtils;
 import me.majiajie.pagerbottomtabstrip.Controller;
 import me.majiajie.pagerbottomtabstrip.PagerBottomTabLayout;
@@ -121,9 +122,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 break;
             }
             case R.id.start:{
-                startActivity(startIntent);
-
-//                Toast.makeText(this, "第二个标题 右边按钮", Toast.LENGTH_SHORT).show();
+//                startActivity(startIntent);
+                new ARJson().parseARJson("default");
+                Toast.makeText(this, "startIntent", Toast.LENGTH_SHORT).show();
                 break;
             }
             case R.id.connect:{

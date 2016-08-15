@@ -10,7 +10,9 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -146,5 +148,25 @@ public class FileUtils {
         inStream.close();
         //把outStream里的数据写入内存
         return outStream.toByteArray();
+    }
+
+    public String readJsonFile(String fileName) throws IOException {
+        String res = "";
+        try {
+
+            FileInputStream fin = new FileInputStream(fileName);
+            int length = fin.available();
+
+            byte[] buffer = new byte[length];
+            fin.read(buffer);
+            res = new String(buffer,"UTF-8");
+//            res = EncodingUtils.getString(buffer, "UTF-8");
+
+            fin.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 }

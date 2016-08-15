@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import andrewl.videowall.DataBase.bmob.BmobHelper;
+import andrewl.videowall.DataBase.bmob.BmobPerson;
 import andrewl.videowall.DataBase.greendao.EventBusMessage;
 import andrewl.videowall.R;
 import andrewl.videowall.UI.FrameLayouts.FramePictureSelect;
@@ -222,15 +223,13 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
 //                    mBmobHelper.updatePersonImage(mPath[0]);
                     break;
                 case 3:
-                    Log.e("====camera====", "onActivityResult:success"+"    objid:"+mBmobHelper.getmObjId());
-                    selectGroup();
+                    Log.e("====camera====", "onActivityResult:success");
                     break;
                 case 4:
                     Log.e("====select====", "onActivityResult:success");
-                    Log.e("====camera====", "onActivityResult:success"+"    objid:"+mBmobHelper.getmObjId());
                     path = new FileUtils().getInstance().convertUriToPath(this,uri);
                     EventBus.getDefault().post(new EventBusMessage(12,path));
-                    selectGroup();
+
                     break;
                 default:
                     break;
@@ -239,10 +238,11 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     }
     private void selectGroup(){
         //group button onlistener
-        mBmobHelper.setmObjId(mPath[2]);
+        Log.e("mpath","0:"+mPath[0]);
+        Log.e("mpath","1:"+mPath[1]);
+        mBmobHelper.setmImagePath(mPath[0]);
+        mBmobHelper.setmVideoPath(mPath[1]);
         mBmobHelper.updatePersonImage(mPath[0]);
-        mBmobHelper.setmObjId(mPath[2]);
-        mBmobHelper.updatePersonVideo(mPath[1]);
     }
     /*
     * 11-save pic
@@ -260,11 +260,14 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
             case 12:
                 Log.e("======","select video success:"+event.message);
                 mPath[1] = event.message;
+                selectGroup();
                 break;
             case 13:
                 mPath[2] = event.message;
-                Log.e("====select====", "onActivityResult:success:"+"     "+event.message);
                 break;
+            case 15:
+                Log.e("===","update video:"+mPath[1]);
+                mBmobHelper.updatePersonVideo(mPath[1],mPath[2]);
         }
     }
 }

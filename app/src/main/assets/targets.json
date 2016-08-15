@@ -6,6 +6,10 @@
       "name" : "argame"
     },
     {
+      "image" : "3.pic_hd.jpg",
+      "name" : "4"
+    },
+    {
       "image" : "idback.jpg",
       "name" : "idback",
       "size" : [8.56, 5.4],

@@ -6,12 +6,17 @@ import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import andrewl.videowall.DataBase.UserInfo.ARInfo;
 import andrewl.videowall.DataBase.UserInfo.UserInfoHelper;
 import andrewl.videowall.DataBase.greendao.EventBusMessage;
+import andrewl.videowall.Utils.ARJson;
 import andrewl.videowall.Utils.FileUtils;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
@@ -37,6 +42,7 @@ public class BmobHelper {
         // 初始化 Bmob SDK
         // 使用时请将第二个参数Application ID替换成你在Bmob服务器端创建的Application ID
         Bmob.initialize(context, "361261f0b3d501e23d63794752378ed7");
+        initPerson("liutao");
     }
     public void setmObjId(String objId){
         this.mObjId = objId;
@@ -45,6 +51,16 @@ public class BmobHelper {
         return mObjId;
     }
     public void initPerson(String account){
+        UserInfoHelper userInfoHelper = new UserInfoHelper().getInstance();
+        userInfoHelper.setNickName("andrew");
+        userInfoHelper.setAccount("liutao");
+        userInfoHelper.setPassword("123456");
+        userInfoHelper.setAge(11);
+        userInfoHelper.setSex("male");
+        userInfoHelper.setBirthday("2012-11-12");
+        userInfoHelper.setRegisterDate("2016-08-14");
+        userInfoHelper.setAuthCode("1234");
+
 
         BmobQuery<BmobPerson> query = new BmobQuery<BmobPerson>();
         query.addWhereEqualTo("account", account);
@@ -57,7 +73,7 @@ public class BmobHelper {
                     //toast("查询成功：共"+object.size()+"条数据。");
                     UserInfoHelper userInfoHelper = new UserInfoHelper().getInstance();
                     for (BmobPerson bmobPerson : object) {
-                        userInfoHelper.setNickNmae(bmobPerson.getNickNmae());
+                        userInfoHelper.setNickName(bmobPerson.getNickNmae());
                         userInfoHelper.setAccount(bmobPerson.getAccount());
                         userInfoHelper.setPassword(bmobPerson.getPassword());
                         userInfoHelper.setAge(bmobPerson.getAge());
@@ -72,6 +88,89 @@ public class BmobHelper {
                 }
             }
         });
+        //create ar.json with image and video url
+        createARJson("default",account);
+    }
+    private void createARJson(final String group, String account){
+        final List<ARInfo> data = new ArrayList<>();
+        BmobQuery<BmobPersonData> eq1 = new BmobQuery<BmobPersonData>();
+        eq1.addWhereEqualTo("account",account);
+        BmobQuery<BmobPersonData> eq2 = new BmobQuery<BmobPersonData>();
+        eq2.addWhereEqualTo("group",group);
+        List<BmobQuery<BmobPersonData>>andQuerys = new ArrayList<BmobQuery<BmobPersonData>>();
+        andQuerys.add(eq1);
+        andQuerys.add(eq2);
+        BmobQuery<BmobPersonData> query = new BmobQuery<BmobPersonData>();
+        query.and(andQuerys);
+        query.setLimit(100);
+        query.findObjects(new FindListener<BmobPersonData>() {
+            @Override
+            public void done(List<BmobPersonData> list, BmobException e) {
+                FileUtils fileUtils = new FileUtils().getInstance();
+                String imagePath = fileUtils.getVideoWallImageFolderPath();
+                String videoPath = fileUtils.getVideoWallVideoFolderPath();
+                //save to json
+                if(e==null){
+                    List<ARInfo> arInfos = new ArrayList<ARInfo>();
+                    for (BmobPersonData bmobPersonData : list){
+                        ARInfo arInfo = new ARInfo();
+
+                        //we have the local file
+                        if(bmobPersonData.getLocalPicAddr() != null && new File(bmobPersonData.getLocalPicAddr()).exists()){
+                            //save local file path into json
+                            arInfo.setLocalImgAddr(bmobPersonData.getLocalPicAddr());
+                        }else {
+                            //download the image
+                            try {
+                                if(bmobPersonData.getRemotePicAddr()!=null
+                                        && new File(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename()).exists()){
+                                    arInfo.setLocalImgAddr(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                }else {
+                                    fileUtils.downloadImage(bmobPersonData.getRemotePicUrl(), imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                    arInfo.setLocalImgAddr(imagePath+"/"+bmobPersonData.getRemotePicAddr().getFilename());
+                                }
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                        if(bmobPersonData.getRemotePicUrl()!=null) {
+                            arInfo.setRemoteImagUrl(bmobPersonData.getRemotePicUrl());
+                        }
+
+                        if(bmobPersonData.getLocalVideoAddr()!=null&&new File(bmobPersonData.getLocalVideoAddr()).exists()){
+                            arInfo.setLocalVideoADDR(bmobPersonData.getLocalVideoAddr());
+                        }else {
+                            //file has downloaded else download now
+                            if(bmobPersonData.getRemoteVideoAddr()!=null
+                                    &&new File(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename()).exists()){
+                                arInfo.setLocalVideoADDR(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
+                            }else {
+                                try {
+                                    fileUtils.downloadImage(bmobPersonData.getRemoteVideoUrl(),videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
+                                    arInfo.setLocalVideoADDR(videoPath+"/"+bmobPersonData.getRemoteVideoAddr().getFilename());
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        }
+                        if(bmobPersonData.getRemoteVideoUrl()!=null) {
+                            arInfo.setRemoteVideoUrl(bmobPersonData.getRemoteVideoUrl());
+                        }
+                        arInfos.add(arInfo);
+                    }
+
+                    try {
+                        new ARJson().saveAsJsonFile(group,arInfos);
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }else {
+                    Log.e("query failed","createARJson"+e.getMessage());
+                }
+            }
+        });
     }
     //TODO:if Video bigger than 10M, don't upload to bmob
     //upload image or video to bmob
@@ -83,7 +182,8 @@ public class BmobHelper {
             public void done(BmobException e) {
                 if(e == null){
                     BmobPersonData data = new BmobPersonData();
-                    data.setName(new UserInfoHelper().getInstance().getNickNmae());
+                    data.setGroup("default");
+                    data.setAccount(new UserInfoHelper().getInstance().getAccount());
                     data.setLocalPicAddr(ImgPath);
                     data.setRemotePicAddr(file);
                     data.save(new SaveListener<String>() {
@@ -128,7 +228,8 @@ public class BmobHelper {
             public void done(BmobException e) {
                 if(e == null){
                     BmobPersonData data = new BmobPersonData();
-                    data.setName(new UserInfoHelper().getInstance().getNickNmae());
+                    data.setGroup("default");
+                    data.setAccount(new UserInfoHelper().getInstance().getAccount());
                     data.setLocalVideoAddr(VideoPath);
                     data.setRemoteVideoAddr(file);
                     data.update(mObjId,new UpdateListener() {

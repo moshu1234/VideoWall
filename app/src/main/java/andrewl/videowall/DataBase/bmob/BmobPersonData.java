@@ -25,7 +25,8 @@ import cn.bmob.v3.datatype.BmobFile;
         wallData.addStringProperty("remoteVideoAddr");
 */
 public class BmobPersonData extends BmobObject {
-    private String name;
+    private String account;
+    private String group;
     private String localPicAddr;
     private BmobFile remotePicAddr;
     private String remotePicUrl;
@@ -33,11 +34,17 @@ public class BmobPersonData extends BmobObject {
     private BmobFile remoteVideoAddr;
     private String remoteVideoUrl;
 
-    public void setName(String name){
-        this.name = name;
+    public void setAccount(String account){
+        this.account = account;
     }
-    public String getName(){
-        return this.name;
+    public String getAccount(){
+        return this.account;
+    }
+    public void setGroup(String group){
+        this.group = group;
+    }
+    public String getGroup(){
+        return this.group;
     }
     public void setLocalPicAddr(String localPicAddr){
         this.localPicAddr = localPicAddr;

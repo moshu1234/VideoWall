@@ -4,7 +4,7 @@ package andrewl.videowall.DataBase.UserInfo;
  * Created by liut1 on 8/13/16.
  */
 public class UserInfoHelper {
-    private String nickNmae;
+    private String nickName;
     private String account;
     private String password;
     private String sex;
@@ -30,11 +30,11 @@ public class UserInfoHelper {
         //TODO:get name from remote bmob
         //TODO:generate an authCode
     }
-    public void setNickNmae(String nickNmae){
-        this.nickNmae = nickNmae;
+    public void setNickName(String nickName){
+        this.nickName = nickName;
     }
-    public String getNickNmae(){
-        return this.nickNmae;
+    public String getNickName(){
+        return this.nickName;
     }
     public void setAccount(String account){
         this.account = account;

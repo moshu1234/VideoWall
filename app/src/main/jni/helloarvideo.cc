@@ -127,7 +127,7 @@ void HelloARVideo::render()
                 }
                 else if(frame.targets()[0].target().name() == std::string("idback") && texid[3]) {
                     video = new ARVideo;
-                    video->openStreamingVideo("http://10.41.18.119/1.mp4", texid[3]);
+                    video->openStreamingVideo("http://bmob-cdn-5573.b0.upaiyun.com/2016/08/13/ef2eafc616f0485aa8b70bb2162f58e6.mp4", texid[3]);
                     video_renderer = renderer[3];
                 }
                 else if(frame.targets()[0].target().name() == std::string("4") && texid[2]) {
@@ -178,7 +178,7 @@ JNIEXPORT jboolean JNICALL JNIFUNCTION_NATIVE(nativeInit(JNIEnv*, jobject))
     bool status = ar.initCamera();
     ar.loadAllFromJsonFile("targets.json");
     ar.loadFromImage("namecard.jpg");
-//    ar.loadFromImage("4.png");
+//    ar.loadFromImage("http://bmob-cdn-5573.b0.upaiyun.com/2016/08/13/6f6ef0fd63354799b382d9763eb3456e.jpg");
     status &= ar.start();
     return status;
 }

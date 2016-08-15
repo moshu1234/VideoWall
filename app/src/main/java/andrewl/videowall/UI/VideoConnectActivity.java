@@ -212,34 +212,38 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
         if (resultCode == RESULT_OK) {
             switch (requestCode&0xf) {
                 case 1:
-                    mBmobHelper.updatePersonImage(mPath[0]);
+//                    mBmobHelper.updatePersonImage(mPath[0]);
                     Log.e("====camera====", "onActivityResult:success");
                     break;
                 case 2:
                     Log.e("====select====", "onActivityResult:success");
                     path = new FileUtils().getInstance().convertUriToPath(this,uri);
                     EventBus.getDefault().post(new EventBusMessage(11,path));
-                    mBmobHelper.updatePersonImage(mPath[0]);
+//                    mBmobHelper.updatePersonImage(mPath[0]);
                     break;
                 case 3:
                     Log.e("====camera====", "onActivityResult:success"+"    objid:"+mBmobHelper.getmObjId());
-                    mBmobHelper.setmObjId(mPath[2]);
-                    mBmobHelper.updatePersonVideo(mPath[1]);
+                    selectGroup();
                     break;
                 case 4:
                     Log.e("====select====", "onActivityResult:success");
                     Log.e("====camera====", "onActivityResult:success"+"    objid:"+mBmobHelper.getmObjId());
                     path = new FileUtils().getInstance().convertUriToPath(this,uri);
                     EventBus.getDefault().post(new EventBusMessage(12,path));
-                    mBmobHelper.setmObjId(mPath[2]);
-                    mBmobHelper.updatePersonVideo(mPath[1]);
+                    selectGroup();
                     break;
                 default:
                     break;
             }
         }
     }
-
+    private void selectGroup(){
+        //group button onlistener
+        mBmobHelper.setmObjId(mPath[2]);
+        mBmobHelper.updatePersonImage(mPath[0]);
+        mBmobHelper.setmObjId(mPath[2]);
+        mBmobHelper.updatePersonVideo(mPath[1]);
+    }
     /*
     * 11-save pic
     * 12-save video

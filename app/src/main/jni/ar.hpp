@@ -25,7 +25,7 @@ public:
     AR();
     virtual ~AR();
     virtual bool initCamera();
-    virtual void loadFromImage(const std::string& path);
+    virtual void loadFromImage(const std::string& path,const std::string& name);
     virtual void loadFromJsonFile(const std::string& path, const std::string& targetname);
     virtual void loadAllFromJsonFile(const std::string& path);
     virtual bool start();

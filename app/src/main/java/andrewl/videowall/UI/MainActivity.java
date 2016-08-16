@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 break;
             }
             case R.id.start:{
-//                startActivity(startIntent);
-                new ARJson().parseARJson("default");
+                startActivity(startIntent);
+//                new ARJson().parseARJson("default");
                 Toast.makeText(this, "startIntent", Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -215,33 +215,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 BottomTabTest();
                 initButtons();
                 new BmobHelper().initBmob(this);
-                addBmobData();
                 new FileUtils().getInstance().createVideoWallFolder();
                 break;
         }
-    }
-    public void addBmobData(){
-        BmobPerson bmobUser = new BmobPerson();
-        bmobUser.setNickNmae("taotao");
-        bmobUser.setAge(18);
-        bmobUser.setBirthday("2016-01-01");
-//        bmobUser.setLocalPicAddr("/1/2/1.png");
-//        bmobUserData.save(new SaveListener<String>() {
-//            @Override
-//            public void done(String s, BmobException e) {
-//                if(e == null){
-//                    Log.e("bmobUserData.save done",s);
-//                }else {
-//                    Log.e("bmobUserData.save fail",e.toString());
-//                }
-//            }
-//        });
-//        BmobQuery<BmobPersonData> bmobQuery = new BmobQuery<BmobPersonData>();
-//        bmobQuery.getObject("11111", new QueryListener<BmobPersonData>() {
-//            @Override
-//            public void done(BmobPersonData userData, BmobException e) {
-//
-//            }
-//        });
     }
 }

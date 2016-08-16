@@ -7,12 +7,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import andrewl.videowall.DataBase.UserInfo.ARInfo;
@@ -21,7 +19,7 @@ import andrewl.videowall.DataBase.UserInfo.ARInfo;
  * Created by liut1 on 8/14/16.
  */
 public class ARJson {
-    public void saveAsJsonFile(String group, List<ARInfo> arInfos) throws JSONException, IOException {
+    public void saveAsJsonFile(String group, ArrayList<ARInfo> arInfos) throws JSONException, IOException {
 
         String jsonDir = new FileUtils().getInstance().getVideoWallJsonFolderPath();
         Log.e("saveAsJsonFile","group:"+group+"     jsondir:"+jsonDir);
@@ -69,9 +67,9 @@ public class ARJson {
             outStream.close();
     }
 
-    public List<ARInfo> parseARJson(String group) {
+    public ArrayList<ARInfo> parseARJson(String group) {
         FileUtils fileUtils = new FileUtils().getInstance();
-        List<ARInfo> arInfos = new ArrayList<>();
+        ArrayList<ARInfo> arInfos = new ArrayList<>();
         String jsonDir = fileUtils.getVideoWallJsonFolderPath();
         File jFile = new File(jsonDir+"/"+group+".json");
         Log.e("jsonfile",jsonDir+"/"+group+".json");
@@ -91,13 +89,14 @@ public class ARJson {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     ARInfo arInfo = new ARInfo();
                     Log.e("imagename",jsonObject.getString("imageName"));
-                    arInfo.setLocalImgAddr(jsonDir+"/"+jsonObject.getString("imageName"));
+                    arInfo.setLocalImgAddr(jsonObject.getString("imageName"));
                     Log.e("imageUrl",jsonObject.getString("imageUrl"));
                     arInfo.setRemoteImagUrl(jsonObject.getString("imageUrl"));
                     Log.e("videoName",jsonObject.getString("videoName"));
                     arInfo.setLocalVideoADDR(jsonObject.getString("videoName"));
                     Log.e("videoUrl",jsonObject.getString("videoUrl"));
                     arInfo.setRemoteVideoUrl(jsonObject.getString("videoUrl"));
+                    arInfos.add(arInfo);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -107,6 +106,7 @@ public class ARJson {
             Log.e("file","not exit");
             return null;
         }
+        Log.e("file","arInfos exit="+arInfos.size());
         return arInfos;
     }
 }

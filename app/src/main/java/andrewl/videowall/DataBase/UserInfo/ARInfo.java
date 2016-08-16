@@ -1,5 +1,7 @@
 package andrewl.videowall.DataBase.UserInfo;
 
+import android.util.Log;
+
 /**
  * Created by liut1 on 8/14/16.
  */
@@ -15,6 +17,7 @@ public class ARInfo {
         this.localImgAddr = localImgAddr;
     }
     public String getLocalImgAddr(){
+        Log.e("====","getLocalImgAddr:"+localImgAddr);
         return this.localImgAddr;
     }
     public void setRemoteImagUrl(String remoteImagUrl){
@@ -23,12 +26,6 @@ public class ARInfo {
     public String getRemoteImagUrl(){
         return this.remoteImagUrl;
     }
-//    public void setImgName(String imgName){
-//        this.ImgName = imgName;
-//    }
-//    public String getImgName(){
-//        return this.ImgName;
-//    }
 
     public void setLocalVideoADDR(String localVideoADDR){
         this.localVideoADDR = localVideoADDR;

@@ -14,12 +14,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import andrewl.videowall.DataBase.UserInfo.ARInfo;
 import andrewl.videowall.DataBase.greendao.VideoWallHelper;
 import andrewl.videowall.R;
 import andrewl.videowall.UI.EasyAR.GLView;
 import andrewl.videowall.UI.EasyAR.MyEasyAR;
 import andrewl.videowall.UI.EasyAR.Renderer;
 import andrewl.videowall.UI.MyWidget.WidgetTopBar;
+import andrewl.videowall.Utils.ARJson;
 import cn.easyar.engine.EasyAR;
 import me.majiajie.pagerbottomtabstrip.Controller;
 import me.majiajie.pagerbottomtabstrip.PagerBottomTabLayout;
@@ -111,8 +116,12 @@ public class StartActivity extends AppCompatActivity  implements View.OnClickLis
         @Override
         public void onSelected(int index, Object tag)
         {
-            Log.i("asd","onSelected:"+index+"   TAG: "+tag.toString());
-
+            Log.e("asd","onSelected:"+index+"   TAG: "+tag.toString());
+            if(index == 1) {
+                ArrayList<ARInfo> arInfos = new ARJson().parseARJson("default");
+                Log.e("====","arinfos sieze="+arInfos.size());
+                mEasyAR.EasyARNativeReinit(arInfos,arInfos.size());
+            }
 //            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //            //transaction.setCustomAnimations(R.anim.push_up_in,R.anim.push_up_out);
 //            transaction.replace(R.id.frameLayout,mFragments.get(index));
@@ -162,7 +171,7 @@ public class StartActivity extends AppCompatActivity  implements View.OnClickLis
         String key = "NreooynJ7BdpePxmoQfi9ykO4khtOHyHMHgov5k77XnUNDRGdNhvizxlcbcmhJsNDlDPgsiL9cgwHjqOL8LsRAPuwjFjATplOxTG67ef61a05502f76daf239723dae099c9AAJA6GnqRdz8vUfMjuCT23Q5yoUsbNdbJFfmx7ZA8hIt6OYiITAPbyJ0YGERhoiTXfsZ";
 
         EasyAR.initialize(this, key);
-        mEasyAR.EasyARNativeInit();
+        mEasyAR.EasyARNativeInit("targets.json");
 
         GLView glView = new GLView(this);
         glView.setRenderer(new Renderer());

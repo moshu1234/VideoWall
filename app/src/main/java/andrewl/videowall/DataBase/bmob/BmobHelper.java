@@ -94,7 +94,7 @@ public class BmobHelper {
         createARJson("default",account);
     }
     private void createARJson(final String group, String account){
-        final List<ARInfo> data = new ArrayList<>();
+        final ArrayList<ARInfo> data = new ArrayList<>();
         BmobQuery<BmobPersonData> eq1 = new BmobQuery<BmobPersonData>();
         eq1.addWhereEqualTo("account",account);
         BmobQuery<BmobPersonData> eq2 = new BmobQuery<BmobPersonData>();
@@ -113,7 +113,7 @@ public class BmobHelper {
                 String videoPath = fileUtils.getVideoWallVideoFolderPath();
                 //save to json
                 if(e==null){
-                    List<ARInfo> arInfos = new ArrayList<ARInfo>();
+                    ArrayList<ARInfo> arInfos = new ArrayList<ARInfo>();
                     for (BmobPersonData bmobPersonData : list){
                         ARInfo arInfo = new ARInfo();
 
@@ -270,6 +270,8 @@ public class BmobHelper {
             public void done(BmobException e) {
                 if(e == null){
                     Log.e("updatePersonVideoExt","success:");
+                    UserInfoHelper userInfoHelper = new UserInfoHelper().getInstance();
+                    createARJson("default",userInfoHelper.getAccount());
                 }else {
                     Log.e("updatePersonVideoExt ","failed"+e.getMessage());
                 }

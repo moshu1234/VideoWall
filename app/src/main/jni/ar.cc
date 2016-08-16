@@ -47,7 +47,7 @@ bool AR::initCamera()
     return status;
 }
 
-void AR::loadFromImage(const std::string& path)
+void AR::loadFromImage(const std::string& path,const std::string& name)
 {
     ImageTarget target;
     std::string jstr = "{\n"
@@ -55,7 +55,7 @@ void AR::loadFromImage(const std::string& path)
                        "  [\n"
                        "    {\n"
                        "      \"image\" : \"" + path + "\",\n"
-                       "      \"name\" : \"" + path.substr(0, path.find_first_of(".")) + "\"\n"
+                       "      \"name\" : \"" + name + "\"\n"
                        "    }\n"
                        "  ]\n"
                        "}";

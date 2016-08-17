@@ -89,7 +89,9 @@ public class ARJson {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     ARInfo arInfo = new ARInfo();
                     Log.e("imagename",jsonObject.getString("imageName"));
-                    arInfo.setLocalImgAddr(jsonObject.getString("imageName"));
+                    String s[] = jsonObject.getString("imageName").split("\\.");
+                    Log.e("imagename",s[0]);
+                    arInfo.setLocalImgAddr(s[0]);
                     Log.e("imageUrl",jsonObject.getString("imageUrl"));
                     arInfo.setRemoteImagUrl(jsonObject.getString("imageUrl"));
                     Log.e("videoName",jsonObject.getString("videoName"));

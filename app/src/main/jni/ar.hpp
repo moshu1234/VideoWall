@@ -25,8 +25,10 @@ public:
     AR();
     virtual ~AR();
     virtual bool initCamera();
-    virtual void loadFromImage(const std::string& path,const std::string& name);
+    virtual void loadFromImage(const std::string& path,const std::string& name,int order);
     virtual void loadFromJsonFile(const std::string& path, const std::string& targetname);
+    virtual void unLoadFromJsonFile();
+    virtual void setTargetNumber(int n);
     virtual void loadAllFromJsonFile(const std::string& path);
     virtual bool start();
     virtual bool stop();
@@ -37,6 +39,8 @@ public:
     virtual void render();
     void setPortrait(bool portrait);
 protected:
+    int targetNum = 0;
+    ImageTarget *imageTargets = NULL;
     CameraDevice camera_;
     ImageTracker tracker_;
     Augmenter augmenter_;

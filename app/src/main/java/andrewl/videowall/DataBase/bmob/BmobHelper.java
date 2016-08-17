@@ -272,6 +272,7 @@ public class BmobHelper {
                     Log.e("updatePersonVideoExt","success:");
                     UserInfoHelper userInfoHelper = new UserInfoHelper().getInstance();
                     createARJson("default",userInfoHelper.getAccount());
+                    EventBus.getDefault().post(new EventBusMessage(16,"update success"));
                 }else {
                     Log.e("updatePersonVideoExt ","failed"+e.getMessage());
                 }

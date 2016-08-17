@@ -28,7 +28,18 @@ extern "C" {
     JNIEXPORT void JNICALL JNIFUNCTION_NATIVE(nativeRender(JNIEnv* env, jobject obj));
     JNIEXPORT void JNICALL JNIFUNCTION_NATIVE(nativeRotationChange(JNIEnv* env, jobject obj, jboolean portrait));
 };
-#define MAXVIDEO 4
+#define MAXVIDEO 100
+
+
+typedef struct {
+    char imageName[128];
+    char imageURL[256];
+    char videoURL[512];
+    char *next;
+}ARImage;
+
+static ARImage *images;
+static int jsonLen = 0;
 namespace EasyAR {
 namespace samples {
 
@@ -88,7 +99,6 @@ void HelloARVideo::resizeGL(int width, int height)
 
 void HelloARVideo::render()
 {
-
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -135,6 +145,18 @@ void HelloARVideo::render()
                     video->openStreamingVideo("http://10.41.18.119/1.mp4", texid[2]);
                     video_renderer = renderer[2];
                 }
+                for(int i=0;i<jsonLen;i++){
+                    LOGE("imagename()=%s,texid=%d",images[i].imageName,texid[i]);
+                    if(frame.targets()[0].target().name() == std::string(images[i].imageName) && texid[i]){
+
+                        LOGE("ha  found it");
+                        video = new ARVideo;
+//                        video->openStreamingVideo("http://bmob-cdn-5573.b0.upaiyun.com/2016/08/13/ef2eafc616f0485aa8b70bb2162f58e6.mp4", texid[i]);
+                        video->openStreamingVideo(images[i].videoURL, texid[i]);
+                        video_renderer = renderer[i];
+                        break;
+                    }
+                }
             }
             if (video) {
                 video->onFound();
@@ -173,13 +195,6 @@ bool HelloARVideo::clear()
 }
 EasyAR::samples::HelloARVideo ar;
 
-typedef struct {
-    char imageName[128];
-    char imageURL[256];
-    char videoURL[512];
-}ARImage;
-
-ARImage *images;
 char * StringToChar(JNIEnv*env, jstring sin, char *sout,int len){
     if(sout == NULL){
         return NULL;
@@ -205,8 +220,8 @@ JNIEXPORT jboolean JNICALL JNIFUNCTION_NATIVE(nativeInit(JNIEnv* env, jobject, j
     StringToChar(env,targetJson,str,sizeof(str));
     LOGE("nativeInit start, str=%s",str);
 
-    ar.loadAllFromJsonFile(str);
-    ar.loadFromImage("namecard.jpg","namecard");
+//    ar.loadAllFromJsonFile(str);
+//    ar.loadFromImage("namecard.jpg","namecard");
 //    ar.loadFromImage("http://bmob-cdn-5573.b0.upaiyun.com/2016/08/13/6f6ef0fd63354799b382d9763eb3456e.jpg");
     status &= ar.start();
 
@@ -250,11 +265,21 @@ JNIEXPORT jboolean JNICALL JNIFUNCTION_NATIVE(nativeReinit(JNIEnv* env, jobject,
     jmethodID method_get = env->GetMethodID(listClass,"get","(I)Ljava/lang/Object;");
     LOGE("nativeReinit start, i=%d",1);
 
-//    char url[512] = {0};
-//    char name[512] = {0};
     if(length > 0){
+        if(images != NULL){
+            jsonLen = 0;
+            free(images);
+            images = NULL;
+        }
         images = (ARImage*)malloc(sizeof(ARImage)*length);
+        for(int i=0;i<length;i++){
+            memset(images[i].imageName,0,sizeof(images[i].imageName));
+            memset(images[i].imageURL,0,sizeof(images[i].imageURL));
+            memset(images[i].videoURL,0,sizeof(images[i].videoURL));
+        }
+        ar.setTargetNumber(length);
     }
+    jsonLen = length;
     for(int i=0;i<arLength;i++){
         jobject info = env->CallObjectMethod(arlist,method_get,i);
         jstring javaNameStr = objReturnString(env,info,"getLocalImgAddr","()Ljava/lang/String;");
@@ -267,25 +292,13 @@ JNIEXPORT jboolean JNICALL JNIFUNCTION_NATIVE(nativeReinit(JNIEnv* env, jobject,
         StringToChar(env,javaVideoUrlStr,images[i].videoURL,sizeof(images[i].videoURL));
 
         LOGE("loadFromImage, imageName=%s,url=%s,video=%s",images[i].imageName,images[i].imageURL,images[i].videoURL);
-//        ar.loadFromImage(images[i].imageURL,images[i].imageName);
-        ar.loadFromImage(images[i].imageURL,"idback");
-//        value = env->GetObjectArrayElement((jobjectArray)obj,1);
-//        const char * imageAddr = env->GetStringUTFChars((jstring)value,0);
-//        LOGE("nativeReinit start, imageAddr=%s",imageAddr);
-//
-//        value = env->GetObjectArrayElement((jobjectArray)obj,2);
-//        const char * videoName = env->GetStringUTFChars((jstring)value,0);
-//        LOGE("nativeReinit start, videoName=%s",videoName);
-//
-//        value = env->GetObjectArrayElement((jobjectArray)obj,3);
-//        const char * videoUrl = env->GetStringUTFChars((jstring)value,0);
-//        LOGE("nativeReinit start, videoUrl=%s",videoUrl);
+        ar.loadFromImage(images[i].imageURL,images[i].imageName,i);
+
+//        ar.loadFromImage(images[i].imageURL,"idback");
     }
     bool status = true;
-//    ar.clear();
-//    status &= ar.stop();
-    ar.loadAllFromJsonFile("targets1.json");
-    ar.loadFromImage("namecard.jpg","namecard");
+//    ar.loadAllFromJsonFile("targets1.json");
+//    ar.loadFromImage("namecard.jpg","namecard");
     status &= ar.start();
 
     return status;

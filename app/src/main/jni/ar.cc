@@ -8,7 +8,8 @@
 #include <algorithm>
 #ifdef ANDROID
 #include <android/log.h>
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "EasyAR", __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "EasyAR-I", __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "EasyAR-E", __VA_ARGS__)
 #else
 #define LOGI(...) printf(__VA_ARGS__)
 #endif
@@ -47,9 +48,14 @@ bool AR::initCamera()
     return status;
 }
 
-void AR::loadFromImage(const std::string& path,const std::string& name)
+void AR::loadFromImage(const std::string& path,const std::string& name,int order)
 {
-    ImageTarget target;
+//    ImageTarget target;
+//    LOGE("loadFromImage start,target number=%d",targetNum);
+    if(order >= targetNum){
+        LOGE("illigal order, we didn't malloc enough memory");
+        return;
+    }
     std::string jstr = "{\n"
                        "  \"images\" :\n"
                        "  [\n"
@@ -59,8 +65,37 @@ void AR::loadFromImage(const std::string& path,const std::string& name)
                        "    }\n"
                        "  ]\n"
                        "}";
-    target.load(jstr.c_str(), EasyAR::kStorageAssets | EasyAR::kStorageJson);
-    tracker_.loadTarget(target, new HelloCallBack());
+//    LOGE("loadFromImage order:%d",order);
+    imageTargets[order].load(jstr.c_str(), EasyAR::kStorageAssets | EasyAR::kStorageJson);
+//    LOGE("loadFromImage loaded");
+    tracker_.loadTarget(imageTargets[order], new HelloCallBack());
+//    LOGE("loadFromImage end");
+}
+void AR::setTargetNumber(int n){
+//    LOGE("target set number = %d",n);
+    if(n <= 0){
+        LOGE("n is illigal");
+        return;
+    }
+    if(imageTargets != NULL){
+        LOGE("target is not NULL");
+        unLoadFromJsonFile();
+    }
+//    imageTargets = (ImageTarget *)malloc(sizeof(ImageTarget)*n);
+    imageTargets = new ImageTarget[n];
+    if(imageTargets == NULL){
+        LOGE("target malloc failed");
+        return;
+    }
+    targetNum = n;
+}
+void AR::unLoadFromJsonFile(){
+        for(int i=0;i<targetNum;i++){
+            tracker_.unloadTarget(imageTargets[i],0);
+        }
+    delete(imageTargets);
+    imageTargets = NULL;
+    targetNum = 0;
 }
 
 void AR::loadFromJsonFile(const std::string& path, const std::string& targetname)

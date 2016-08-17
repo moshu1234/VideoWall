@@ -268,6 +268,10 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
             case 15:
                 Log.e("===","update video:"+mPath[1]);
                 mBmobHelper.updatePersonVideo(mPath[1],mPath[2]);
+                break;
+            case 16:
+                Toast.makeText(this,"upload success",Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 }

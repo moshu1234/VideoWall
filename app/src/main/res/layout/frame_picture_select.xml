@@ -7,7 +7,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="250dp">
     <Button
         android:id="@+id/select_picture"
         android:text="@string/action_selectPicture"
@@ -31,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="250dp">
+        android:layout_marginTop="100dp">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

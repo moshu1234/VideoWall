@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 //        initBmob();
         startIntent = new Intent(this,StartActivity.class);
         connectIntent = new Intent(this,VideoConnectActivity.class);
+        connectIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
     }
     @Override
     public void onStart() {

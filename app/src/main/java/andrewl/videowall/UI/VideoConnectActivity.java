@@ -6,12 +6,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -34,6 +38,8 @@ import andrewl.videowall.UI.FrameLayouts.FrameVideoConnectIntroduce;
 import andrewl.videowall.UI.FrameLayouts.FrameVideoSelect;
 import andrewl.videowall.UI.MyWidget.WidgetTopBar;
 import andrewl.videowall.Utils.FileUtils;
+import andrewl.videowall.Utils.ProgressUtils;
+import andrewl.videowall.Utils.ThreadUtils;
 import me.majiajie.pagerbottomtabstrip.Controller;
 import me.majiajie.pagerbottomtabstrip.PagerBottomTabLayout;
 import me.majiajie.pagerbottomtabstrip.TabItemBuilder;
@@ -49,6 +55,8 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
 
     private String[] mPath = new String[3];
     private BmobHelper mBmobHelper;
+    private ProgressUtils progressUtils;
+    private ThreadUtils mThreadUtils;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +68,11 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
         BottomTabTest();
         initFrameLayouts();
         mBmobHelper = new BmobHelper();
+    }
+    @Override
+    protected void onDestroy(){
+        Log.e("on destroy","aha");
+        super.onDestroy();
     }
     private void initFrameLayouts(){
         mFragments = new ArrayList<>();
@@ -89,6 +102,7 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
         switch (v.getId()) {
             case R.id.ib_left_top_bar: {
                 Toast.makeText(this, "第二个标题 左边按钮", Toast.LENGTH_SHORT).show();
+                finish();
                 break;
             }
             case R.id.ib_right_top_bar: {
@@ -130,6 +144,14 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
             }
         }else {
             //下一步
+            if(currentFragment == (mFragments.size()-1)){
+                //TODO:show progress bar, and then goto main fragment
+                progressUtils = new ProgressUtils(this);
+                mThreadUtils = new ThreadUtils(100);
+                mThreadUtils.start();
+                uploadToBmob();
+                return;
+            }
             if(currentFragment < 2){
                 currentFragment++;
             }else {
@@ -155,6 +177,15 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
                 mTabItemBuilder2.getTabItemBuild().setText("下一步");
                 break;
         }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.setCustomAnimations(R.anim.push_up_in,R.anim.push_up_out);
+        transaction.replace(R.id.frameLayout,mFragments.get(currentFragment));
+        transaction.commit();
+    }
+    private void BottomGoToFistFrame(){
+        currentFragment = 0;
+        mTabItemBuilder1.getTabItemBuild().setText("返  回");
+        mTabItemBuilder2.getTabItemBuild().setText("下一步");
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //            transaction.setCustomAnimations(R.anim.push_up_in,R.anim.push_up_out);
         transaction.replace(R.id.frameLayout,mFragments.get(currentFragment));
@@ -197,36 +228,33 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("====0====", "onActivityResult:"+requestCode);
         Intent intent = new Intent("com.android.camera.action.CROP");
         Uri uri = null;
         String path;
         //如果返回的是拍照上传
         if (data == null) {
-            Log.e("========", "data null:");
 //            uri = imageUri;
         } //返回的是图库上传
         else {
             uri = data.getData();
-            Log.e("====1====", "onActivityResult:" + uri.getPath());
         }
         if (resultCode == RESULT_OK) {
             switch (requestCode&0xf) {
                 case 1:
 //                    mBmobHelper.updatePersonImage(mPath[0]);
-                    Log.e("====camera====", "onActivityResult:success");
+                    Log.e("====camera=pic===", "onActivityResult:success");
+
                     break;
                 case 2:
-                    Log.e("====select====", "onActivityResult:success");
+                    Log.e("====select==pic==", "onActivityResult:success");
                     path = new FileUtils().getInstance().convertUriToPath(this,uri);
                     EventBus.getDefault().post(new EventBusMessage(11,path));
-//                    mBmobHelper.updatePersonImage(mPath[0]);
                     break;
                 case 3:
-                    Log.e("====camera====", "onActivityResult:success");
+                    Log.e("====camera==video==", "onActivityResult:success");
                     break;
                 case 4:
-                    Log.e("====select====", "onActivityResult:success");
+                    Log.e("====select==video==", "onActivityResult:success");
                     path = new FileUtils().getInstance().convertUriToPath(this,uri);
                     EventBus.getDefault().post(new EventBusMessage(12,path));
 
@@ -236,10 +264,18 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
             }
         }
     }
-    private void selectGroup(){
+    private void uploadToBmob(){
         //group button onlistener
         Log.e("mpath","0:"+mPath[0]);
         Log.e("mpath","1:"+mPath[1]);
+        if(TextUtils.isEmpty(mPath[0])){
+            Toast.makeText(this,"请选择或拍摄图片",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(TextUtils.isEmpty(mPath[1])){
+            Toast.makeText(this,"请选择或拍摄视频",Toast.LENGTH_SHORT).show();
+            return;
+        }
         mBmobHelper.setmImagePath(mPath[0]);
         mBmobHelper.setmVideoPath(mPath[1]);
         mBmobHelper.updatePersonImage(mPath[0]);
@@ -251,16 +287,23 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     * */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusMessage event) {
+        Log.e("onMessageEvent","come in:"+event.message);
         switch (event.type){
             case 11:
                 //TODO:save local photo to 1
+                if(currentFragment != 1)//1 image select frame
+                {
+//                    break;
+                }
                 Log.e("======","select photo success:"+event.message);
+                Message message = new Message();
+                message.what = 1;
+                handler.sendMessage(message);
                 mPath[0] = event.message;
                 break;
             case 12:
                 Log.e("======","select video success:"+event.message);
                 mPath[1] = event.message;
-                selectGroup();
                 break;
             case 13:
                 mPath[2] = event.message;
@@ -270,8 +313,31 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
                 mBmobHelper.updatePersonVideo(mPath[1],mPath[2]);
                 break;
             case 16:
-                Toast.makeText(this,"upload success",Toast.LENGTH_SHORT).show();
+                if(event.message.equals("success")){
+                    progressUtils.setProgressMessage("100%");
+                }
+                progressUtils.dismissProgressBar();
+                mThreadUtils.stopNow();
+                break;
+            case 17://update progress
+                if(event.message.equals("101%")){
+                    progressUtils.dismissProgressBar();
+                    BottomGoToFistFrame();
+                }else {
+                    progressUtils.setProgressMessage(event.message);
+                }
                 break;
         }
     }
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            if(msg.what == 1){
+                BottomClickAction(1);//next step
+            }else {
+                BottomGoToFistFrame();
+            }
+            return false;
+        }
+    });
 }

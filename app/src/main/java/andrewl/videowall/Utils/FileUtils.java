@@ -64,7 +64,15 @@ public class FileUtils {
         }
         return data;
     }
+    public String getMicroMsgPath(){
+        // 创建一个文件夹对象，赋值为外部存储器的目录
+        File sdcardDir = Environment.getExternalStorageDirectory();
+        // 得到一个路径，内容是sdcard的文件夹路径和名字
+        String path = sdcardDir.getPath()
+                + "/tencent/MicroMsg/03f4f84ab7a3fed488fe2439847f5bff/video";
 
+        return path;
+    }
     public void createVideoWallFolder(){
         // 创建一个文件夹对象，赋值为外部存储器的目录
         File sdcardDir = Environment.getExternalStorageDirectory();

@@ -210,6 +210,7 @@ public class BmobHelper {
                     });
                 }else {
                     Log.e("file upload failed",e.getMessage());
+                    EventBus.getDefault().post(new EventBusMessage(16,"fail"));
                 }
             }
         });
@@ -226,6 +227,7 @@ public class BmobHelper {
                     EventBus.getDefault().post(new EventBusMessage(15,"upload video"));
                 }else {
                     Log.e("updatePersonImageExt ","failed"+e.getMessage());
+                    EventBus.getDefault().post(new EventBusMessage(16,"fail"));
                 }
             }
         });
@@ -257,6 +259,7 @@ public class BmobHelper {
                     });
                 }else {
                     Log.e("file upload failed",e.getMessage());
+                    EventBus.getDefault().post(new EventBusMessage(16,"fail"));
                 }
             }
         });
@@ -272,9 +275,10 @@ public class BmobHelper {
                     Log.e("updatePersonVideoExt","success:");
                     UserInfoHelper userInfoHelper = new UserInfoHelper().getInstance();
                     createARJson("default",userInfoHelper.getAccount());
-                    EventBus.getDefault().post(new EventBusMessage(16,"update success"));
+                    EventBus.getDefault().post(new EventBusMessage(16,"success"));
                 }else {
                     Log.e("updatePersonVideoExt ","failed"+e.getMessage());
+                    EventBus.getDefault().post(new EventBusMessage(16,"fail"));
                 }
             }
         });

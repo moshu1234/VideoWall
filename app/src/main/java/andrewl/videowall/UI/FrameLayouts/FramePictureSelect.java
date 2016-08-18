@@ -97,6 +97,8 @@ public class FramePictureSelect extends Fragment implements View.OnClickListener
             // 有些人使用其他的Action但我发现在有些机子中会出问题，所以优先选择这个
             Intent intent = new Intent();
             intent.setType("image/*");
+//            Uri uri = Uri.parse(new FileUtils().getInstance().getMicroMsgPath());
+//            intent.setDataAndType(uri,"image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(intent, 2);
         } catch (Exception e) {

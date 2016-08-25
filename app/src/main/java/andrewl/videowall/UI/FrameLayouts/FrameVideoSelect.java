@@ -43,7 +43,7 @@ public class FrameVideoSelect extends Fragment  implements View.OnClickListener{
     {
         mView = inflater.inflate(R.layout.frame_video_select, container, false);
         initButtons();
-//        setPicThumbnail(fileUtils.getmImageFile());
+        setPicThumbnail(fileUtils.getmImageFile());
         return mView;
     }
 

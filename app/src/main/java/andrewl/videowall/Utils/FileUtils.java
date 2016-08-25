@@ -45,8 +45,10 @@ public class FileUtils {
     }
     public void setmImageFile(String file){
         mImageFile = file;
+        Log.e("setmImageFile",mImageFile);
     }
     public String getmImageFile(){
+        Log.e("getmImageFile",mImageFile);
         return mImageFile;
     }
     public void setmVideoFile(String file){
@@ -265,12 +267,14 @@ public class FileUtils {
         Bitmap bitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        bitmap = BitmapFactory.decodeFile(imagePath,options);
+        BitmapFactory.decodeFile(imagePath,options);
+
         options.inJustDecodeBounds = false;
-        int h = bitmap.getHeight();
-        int w = bitmap.getWidth();
+        int h = options.outHeight;
+        int w = options.outWidth;
         int beWidth = w/width;
         int beHeight = h/height;
+        Log.e("getImageThumbnail","w="+w+"      h="+h+"       width="+width+"       height="+height);
         int be = 1;
         if(beWidth < beHeight){
             be = beWidth;
@@ -280,6 +284,7 @@ public class FileUtils {
         if(be <= 0){
             be = 1;
         }
+        Log.e("be","="+be);
         options.inSampleSize = be;
         bitmap = BitmapFactory.decodeFile(imagePath,options);
         bitmap = ThumbnailUtils.extractThumbnail(bitmap,width,height,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);

@@ -48,6 +48,9 @@ public class FileUtils {
         Log.e("setmImageFile",mImageFile);
     }
     public String getmImageFile(){
+        if(mImageFile == null){
+            return null;
+        }
         Log.e("getmImageFile",mImageFile);
         return mImageFile;
     }
@@ -55,6 +58,9 @@ public class FileUtils {
         mVideoFile = file;
     }
     public String getmVideoFile(){
+        if(mVideoFile == null){
+            return null;
+        }
         return mVideoFile;
     }
     /**

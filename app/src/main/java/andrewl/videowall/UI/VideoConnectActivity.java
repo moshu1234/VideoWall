@@ -24,6 +24,7 @@ import java.util.List;
 import andrewl.videowall.DataBase.bmob.BmobHelper;
 import andrewl.videowall.DataBase.greendao.EventBusMessage;
 import andrewl.videowall.R;
+import andrewl.videowall.UI.FrameLayouts.FrameGroupSelect;
 import andrewl.videowall.UI.FrameLayouts.FramePictureSelect;
 import andrewl.videowall.UI.FrameLayouts.FrameVideoConnectIntroduce;
 import andrewl.videowall.UI.FrameLayouts.FrameVideoSelect;
@@ -41,6 +42,7 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     private FrameVideoConnectIntroduce introduceFragment;
     private FramePictureSelect picSelectFragment;
     private FrameVideoSelect vidSelectFragment;
+    private FrameGroupSelect groupSelectFragment;
     private Integer currentFragment;
     private TabItemBuilder mTabItemBuilder1;
     private TabItemBuilder mTabItemBuilder2;
@@ -72,10 +74,13 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
         introduceFragment = new FrameVideoConnectIntroduce();
         picSelectFragment = new FramePictureSelect();
         vidSelectFragment = new FrameVideoSelect();
+        groupSelectFragment = new FrameGroupSelect();
 
-        mFragments.add(introduceFragment);
+
+//        mFragments.add(introduceFragment);
         mFragments.add(picSelectFragment);
         mFragments.add(vidSelectFragment);
+        mFragments.add(groupSelectFragment);
 //        FragmentManager manager = getSupportFragmentManager();
 //        FragmentTransaction transaction = manager.beginTransaction();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -151,7 +156,7 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
                 progressUtils = new ProgressUtils(this);
 //                mThreadUtils = new ThreadUtils(100);
 //                mThreadUtils.start();
-                uploadToBmob();
+                uploadToBmob(groupSelectFragment.getSelectedGroup());
                 return;
             }
             if(currentFragment < 2){
@@ -234,6 +239,7 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.e("onActivityResult",requestCode+":"+resultCode);
         Intent intent = new Intent("com.android.camera.action.CROP");
         Uri uri = null;
         String path;
@@ -270,11 +276,11 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
             }
         }
     }
-    private void uploadToBmob(){
+    private void uploadToBmob(String group){
         //group button onlistener
         Log.e("mpath","0:"+mPath[0]);
         Log.e("mpath","1:"+mPath[1]);
-        mBmobHelper.updatePersonData(mPath);
+        mBmobHelper.updatePersonData(mPath,group);
     }
     /*
     * 11-save pic
@@ -288,7 +294,7 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
                 //TODO:save local photo to 1
 //                mPath[0] = event.message;
                 mPath[0] = fileUtils.compressPicture(event.message);
-                if(currentFragment != 1)//1 image select frame
+                if(currentFragment != 0)//1 image select frame
                 {
                     break;
                 }
@@ -300,9 +306,12 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
             case 12:
                 Log.e("======","select video success:"+event.message);
                 mPath[1] = event.message;
-                Message msg = new Message();
-                msg.what = 1;
-                msg.obj = mPath[1];
+                if(currentFragment != 1)//1 image select frame
+                {
+                    break;
+                }
+                Log.e("======","select photo success:"+event.message);
+                handler.sendEmptyMessage(1);
                 fileUtils.setmVideoFile(event.message);
                 vidSelectFragment.setVidThumbnail(event.message);
                 break;

@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.MediaBrowserCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,6 +109,9 @@ public class FrameVideoSelect extends Fragment  implements View.OnClickListener{
 
     }
     public void setPicThumbnail(String imgPath){
+        if(TextUtils.isEmpty(imgPath)){
+            return;
+        }
         Log.e("setPicThumbnail",imgPath);
         ImageView pic = (ImageView)mView.findViewById(R.id.pic_thumbnail);
 
@@ -118,6 +122,9 @@ public class FrameVideoSelect extends Fragment  implements View.OnClickListener{
         pic.setImageBitmap(bitmap);
     }
     public void setVidThumbnail(String vidPath){
+        if(TextUtils.isEmpty(vidPath)){
+            return;
+        }
         Log.e("setVidThumbnail",vidPath);
         ImageView vid = (ImageView)mView.findViewById(R.id.vid_thumbnail);
 

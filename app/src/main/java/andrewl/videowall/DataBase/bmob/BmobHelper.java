@@ -186,7 +186,7 @@ public class BmobHelper {
 
     //TODO:if Video bigger than 10M, don't upload to bmob
     //upload image or video to bmob
-    public void updatePersonData(final String[] path){
+    public void updatePersonData(final String[] path,final String group){
         BmobFile.uploadBatch(path, new UploadBatchListener() {
             @Override
             public void onSuccess(List<BmobFile> files, List<String> urls) {
@@ -249,6 +249,35 @@ public class BmobHelper {
             @Override
             public void onProgress(Integer integer, long l) {
 
+            }
+        });
+    }
+    public void acquireGroup(final List<String> groups){
+        final String accout = new UserInfoHelper().getInstance().getAccount();
+        BmobQuery<BmobPersonData> query = new BmobQuery<BmobPersonData>();
+        query.addWhereEqualTo("account", accout);
+        //返回50条数据，如果不加上这条语句，默认返回10条数据
+        query.setLimit(100);
+        query.findObjects(new FindListener<BmobPersonData>() {
+            @Override
+            public void done(List<BmobPersonData> object, BmobException e) {
+                if(e==null){
+                    boolean isExist = false;
+                    for (BmobPersonData bmobPersonData : object) {
+                        for(String obj : groups){
+                            if(obj.equals(bmobPersonData.getGroup())){
+                                isExist = true;
+                                break;
+                            }
+                        }
+                        if(isExist == false){
+                            groups.add(bmobPersonData.getGroup());
+                        }
+                        isExist = false;
+                    }
+                }else{
+                    Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                }
             }
         });
     }

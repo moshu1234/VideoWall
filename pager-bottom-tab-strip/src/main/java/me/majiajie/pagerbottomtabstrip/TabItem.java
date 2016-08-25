@@ -534,6 +534,7 @@ class TabItem extends View
         {
             mText = text;
             TabItem.this.setTag(text);
+            invalidateView();
             return builder.this;
         }
 

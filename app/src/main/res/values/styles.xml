@@ -7,7 +7,20 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <style name="recycler_group_item">
+        <item name="android:textSize">@dimen/size_middle</item>
+        <item name="android:height">@dimen/item_height</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
+    <style name="recycler_content_item">
+        <item name="android:textSize">@dimen/size_small</item>
+        <!--<item name="android:layout_weight">1</item>-->
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/img_height</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
     <!--WidgetTopBar是自定义控件的类名-->
     <declare-styleable name="WidgetTopBar">
         <attr name="m_title" format="string" />

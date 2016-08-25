@@ -22,7 +22,7 @@ public class ARJson {
     public void saveAsJsonFile(String group, ArrayList<ARInfo> arInfos) throws JSONException, IOException {
 
         String jsonDir = new FileUtils().getInstance().getVideoWallJsonFolderPath();
-        Log.e("saveAsJsonFile","group:"+group+"     jsondir:"+jsonDir);
+        Log.e("saveAsJsonFile","group:"+group+"     jsondir:"+jsonDir+"     :"+arInfos.size());
         Map<String,String> element = new HashMap<String, String>();
 
         JSONArray jsonArray = new JSONArray();

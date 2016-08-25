@@ -1,25 +1,33 @@
 package andrewl.videowall.UI.FrameLayouts;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.MediaBrowserCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Handler;
 
 import andrewl.videowall.DataBase.greendao.EventBusMessage;
 import andrewl.videowall.R;
+import andrewl.videowall.UI.VideoConnectActivity;
 import andrewl.videowall.Utils.FileUtils;
 
 /**
@@ -28,13 +36,14 @@ import andrewl.videowall.Utils.FileUtils;
 public class FrameVideoSelect extends Fragment  implements View.OnClickListener{
     private View mView;
     private Uri mVideoUri;
-
+    private FileUtils fileUtils = new FileUtils().getInstance();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.frame_video_select, container, false);
         initButtons();
+//        setPicThumbnail(fileUtils.getmImageFile());
         return mView;
     }
 
@@ -97,5 +106,25 @@ public class FrameVideoSelect extends Fragment  implements View.OnClickListener{
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         return dateFormat.format(date) + ".mp4";
 
+    }
+    public void setPicThumbnail(String imgPath){
+        Log.e("setPicThumbnail",imgPath);
+        ImageView pic = (ImageView)mView.findViewById(R.id.pic_thumbnail);
+
+        ViewGroup.LayoutParams para;
+        para = pic.getLayoutParams();
+
+        Bitmap bitmap = new FileUtils().getInstance().getImageThumbnail(imgPath,para.width,para.height);
+        pic.setImageBitmap(bitmap);
+    }
+    public void setVidThumbnail(String vidPath){
+        Log.e("setVidThumbnail",vidPath);
+        ImageView vid = (ImageView)mView.findViewById(R.id.vid_thumbnail);
+
+        ViewGroup.LayoutParams para;
+        para = vid.getLayoutParams();
+
+        Bitmap bitmap = new FileUtils().getInstance().generateVideoThumbnail(vidPath,para.width,para.height,MediaStore.Images.Thumbnails.MICRO_KIND);
+        vid.setImageBitmap(bitmap);
     }
 }

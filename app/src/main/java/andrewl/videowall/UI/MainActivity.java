@@ -35,7 +35,7 @@ import me.majiajie.pagerbottomtabstrip.listener.OnTabItemSelectListener;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener{
     private VideoWallHelper mVideoWallHelper;
-    private Intent startIntent, connectIntent;
+    private Intent startIntent, connectIntent,mgrIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         startIntent = new Intent(this,StartActivity.class);
         connectIntent = new Intent(this,VideoConnectActivity.class);
         connectIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mgrIntent = new Intent(this,ConnectManageActivity.class);
+        mgrIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
     }
     @Override
     public void onStart() {
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 break;
             }
             case R.id.management:{
-//                startActivity(connectIntent);
+                startActivity(mgrIntent);
 
                 Toast.makeText(this, "management", Toast.LENGTH_SHORT).show();
                 break;
@@ -210,6 +212,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusMessage event) {
+        Log.e("main init","event type:"+event.type);
         switch (event.type){
             case 1:
                 initTopbar();

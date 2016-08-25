@@ -1,20 +1,15 @@
 package andrewl.videowall.UI;
 
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -23,14 +18,10 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import andrewl.videowall.DataBase.bmob.BmobHelper;
-import andrewl.videowall.DataBase.bmob.BmobPerson;
 import andrewl.videowall.DataBase.greendao.EventBusMessage;
 import andrewl.videowall.R;
 import andrewl.videowall.UI.FrameLayouts.FramePictureSelect;
@@ -39,7 +30,6 @@ import andrewl.videowall.UI.FrameLayouts.FrameVideoSelect;
 import andrewl.videowall.UI.MyWidget.WidgetTopBar;
 import andrewl.videowall.Utils.FileUtils;
 import andrewl.videowall.Utils.ProgressUtils;
-import andrewl.videowall.Utils.ThreadUtils;
 import me.majiajie.pagerbottomtabstrip.Controller;
 import me.majiajie.pagerbottomtabstrip.PagerBottomTabLayout;
 import me.majiajie.pagerbottomtabstrip.TabItemBuilder;
@@ -48,15 +38,17 @@ import me.majiajie.pagerbottomtabstrip.listener.OnTabItemSelectListener;
 
 public class VideoConnectActivity extends AppCompatActivity  implements View.OnClickListener  {
     private List<Fragment> mFragments;
-    private Fragment fragment1, fragment2, fragment3;
+    private FrameVideoConnectIntroduce introduceFragment;
+    private FramePictureSelect picSelectFragment;
+    private FrameVideoSelect vidSelectFragment;
     private Integer currentFragment;
     private TabItemBuilder mTabItemBuilder1;
     private TabItemBuilder mTabItemBuilder2;
 
-    private String[] mPath = new String[3];
+    private String[] mPath = new String[2];
     private BmobHelper mBmobHelper;
     private ProgressUtils progressUtils;
-    private ThreadUtils mThreadUtils;
+    private FileUtils fileUtils = new FileUtils().getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,14 +69,15 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     private void initFrameLayouts(){
         mFragments = new ArrayList<>();
 
-        fragment1 = new FrameVideoConnectIntroduce();
-        fragment2 = new FramePictureSelect();
-        fragment3 = new FrameVideoSelect();
+        introduceFragment = new FrameVideoConnectIntroduce();
+        picSelectFragment = new FramePictureSelect();
+        vidSelectFragment = new FrameVideoSelect();
 
-        mFragments.add(fragment1);
-        mFragments.add(fragment2);
-        mFragments.add(fragment3);
-
+        mFragments.add(introduceFragment);
+        mFragments.add(picSelectFragment);
+        mFragments.add(vidSelectFragment);
+//        FragmentManager manager = getSupportFragmentManager();
+//        FragmentTransaction transaction = manager.beginTransaction();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         currentFragment = 0;
         // transaction.setCustomAnimations(R.anim.push_up_in,R.anim.push_up_out);
@@ -138,24 +131,34 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
         if(index == 0){
             //上一步
             if(currentFragment > 0){
-                currentFragment--;
+                --currentFragment;
             }else {
                 //TODO:goto main activity
             }
         }else {
             //下一步
             if(currentFragment == (mFragments.size()-1)){
+
+                if(TextUtils.isEmpty(mPath[0])){
+                    Toast.makeText(this,"请选择或拍摄图片",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(TextUtils.isEmpty(mPath[1])){
+                    Toast.makeText(this,"请选择或拍摄视频",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 //TODO:show progress bar, and then goto main fragment
                 progressUtils = new ProgressUtils(this);
-                mThreadUtils = new ThreadUtils(100);
-                mThreadUtils.start();
+//                mThreadUtils = new ThreadUtils(100);
+//                mThreadUtils.start();
                 uploadToBmob();
                 return;
             }
             if(currentFragment < 2){
-                currentFragment++;
+                ++currentFragment;
             }else {
                 //TODO:connect complete,goto main activity
+//                vidSelectFragment.setPicThumbnail(mPath[0]);
             }
         }
         Log.i("====","currentFragment="+currentFragment);
@@ -181,6 +184,9 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
 //            transaction.setCustomAnimations(R.anim.push_up_in,R.anim.push_up_out);
         transaction.replace(R.id.frameLayout,mFragments.get(currentFragment));
         transaction.commit();
+//        if(currentFragment == 2){
+//            vidSelectFragment.setPicThumbnail(mPath[0]);
+//        }
     }
     private void BottomGoToFistFrame(){
         currentFragment = 0;
@@ -268,17 +274,7 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
         //group button onlistener
         Log.e("mpath","0:"+mPath[0]);
         Log.e("mpath","1:"+mPath[1]);
-        if(TextUtils.isEmpty(mPath[0])){
-            Toast.makeText(this,"请选择或拍摄图片",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(TextUtils.isEmpty(mPath[1])){
-            Toast.makeText(this,"请选择或拍摄视频",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mBmobHelper.setmImagePath(mPath[0]);
-        mBmobHelper.setmVideoPath(mPath[1]);
-        mBmobHelper.updatePersonImage(mPath[0]);
+        mBmobHelper.updatePersonData(mPath);
     }
     /*
     * 11-save pic
@@ -287,51 +283,44 @@ public class VideoConnectActivity extends AppCompatActivity  implements View.OnC
     * */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusMessage event) {
-        Log.e("onMessageEvent","come in:"+event.message);
         switch (event.type){
             case 11:
                 //TODO:save local photo to 1
+//                mPath[0] = event.message;
+                mPath[0] = fileUtils.compressPicture(event.message);
                 if(currentFragment != 1)//1 image select frame
                 {
-//                    break;
+                    break;
                 }
                 Log.e("======","select photo success:"+event.message);
-                Message message = new Message();
-                message.what = 1;
-                handler.sendMessage(message);
-                mPath[0] = event.message;
+                handler.sendEmptyMessage(1);
+
+                fileUtils.setmImageFile(event.message);
                 break;
             case 12:
                 Log.e("======","select video success:"+event.message);
                 mPath[1] = event.message;
-                break;
-            case 13:
-                mPath[2] = event.message;
-                break;
-            case 15:
-                Log.e("===","update video:"+mPath[1]);
-                mBmobHelper.updatePersonVideo(mPath[1],mPath[2]);
+                Message msg = new Message();
+                msg.what = 1;
+                msg.obj = mPath[1];
+                fileUtils.setmVideoFile(event.message);
+                vidSelectFragment.setVidThumbnail(event.message);
                 break;
             case 16:
-                if(event.message.equals("success")){
-                    progressUtils.setProgressMessage("100%");
-                }
                 progressUtils.dismissProgressBar();
-                mThreadUtils.stopNow();
+                if(event.message.equals("success")){
+                    handler.sendEmptyMessage(0);
+                }
                 break;
             case 17://update progress
-                if(event.message.equals("101%")){
-                    progressUtils.dismissProgressBar();
-                    BottomGoToFistFrame();
-                }else {
-                    progressUtils.setProgressMessage(event.message);
-                }
+                progressUtils.setProgressMessage(event.message);
                 break;
         }
     }
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
+            Log.e("====","handleMessage:"+msg.what);
             if(msg.what == 1){
                 BottomClickAction(1);//next step
             }else {

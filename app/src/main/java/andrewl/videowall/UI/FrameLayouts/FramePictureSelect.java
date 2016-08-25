@@ -44,7 +44,7 @@ public class FramePictureSelect extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.frame_picture_select, container, false);
-
+        Log.e("===========","init frame picture select ");
         initButtons();
         return mView;
     }
